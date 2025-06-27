@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storyblok Blog Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00b3b0;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00b3b0;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .post-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .post-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .post-content {
+            padding: 1.5rem;
+        }
+
+        .post-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .post-title:hover {
+            color: #00b3b0;
+        }
+
+        .post-excerpt {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #888;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .post-date {
+            font-size: 0.8rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pagination button:hover {
+            background: #e9ecef;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination button.active {
+            background: #00b3b0;
+            color: white;
+            border-color: #00b3b0;
+        }
+
+        .filters {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Storyblok Blog</div>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search posts..." id="searchInput">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="filters">
+            <div class="filter-group">
+                <label>Category:</label>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">All Categories</option>
+                </select>
+                
+                <label>Author:</label>
+                <select id="authorFilter" class="filter-select">
+                    <option value="">All Authors</option>
+                </select>
+                
+                <button onclick="clearFilters()">Clear Filters</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            Loading posts...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="postsContainer" class="posts-grid"></div>
+
+        <div id="pagination" class="pagination"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/storyblok-js-client@latest/dist/index.umd.js"></script>
+    <script>
+        // Initialize Storyblok client
+        const storyblokClient = new StoryblokClient({
+            accessToken: 'your-storyblok-token-here', // Replace with your token
+            cache: {
+                clear: 'auto',
+                type: 'memory'
+            }
+        });
+
+        // App state
+        let currentPage = 1;
+        let currentCategory = '';
+        let currentAuthor = '';
+        let currentSearch = '';
+        let allCategories = [];
+        let allAuthors = [];
+
+        // DOM elements
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+        const postsContainer = document.getElementById('postsContainer');
+        const paginationEl = document.getElementById('pagination');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const authorFilter = document.getElementById('authorFilter');
+
+        // Initialize app
+        async function init() {
+            try {
+                await Promise.all([
+                    loadCategories(),
+                    loadAuthors(),
+                    loadPosts()
+                ]);
+                setupEventListeners();
+            } catch (error) {
+                showError('Failed to initialize app: ' + error.message);
+            }
+        }
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const { data } = await storyblokClient.get('cdn/stories', {
+                    starts_with: 'categories',
+                    version: 'published'
+                });
+                
+                allCategories = data.stories;
+                populateSelect(categoryFilter, allCategories, 'name');
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Load authors
+        async function loadAuthors() {
+            try {
+                const { data } = await storyblokClient.get('cdn/stories', {
+                    starts_with: 'authors',
+                    version: 'published'
+                });
+                
+                allAuthors = data.stories;
+                populateSelect(authorFilter, allAuthors, 'name');
+            } catch (error) {
+                console.error('Error loading authors:', error);
+            }
+        }
+
+        // Populate select element
+        function populateSelect(selectEl, items, labelField) {
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.slug;
+                option.textContent = item.content[labelField] || item.name;
+                selectEl.appendChild(option);
+            });
+        }
+
+        // Load posts
+        async function loadPosts(page = 1) {
+            showLoading(true);
+            hideError();
+
+            try {
+                const params = {
+                    starts_with: 'blog',
+                    version: 'published',
+                    resolve_relations: 'author,category',
+                    sort_by: 'published_at:desc',
+                    per_page: 9,
+                    page: page
+                };
+
+                // Add filters
+                if (currentSearch) {
+                    params.search_term = currentSearch;
+                }
+
+                if (currentCategory) {
+                    params.filter_query = {
+                        ...params.filter_query,
+                        'category.slug': { 'in': currentCategory }
+                    };
+                }
+
+                if (currentAuthor) {
+                    params.filter_query = {
+                        ...params.filter_query,
+                        'author.slug': { 'in': currentAuthor }
+                    };
+                }
+
+                const { data } = await storyblokClient.get('cdn/stories', params);
+                
+                renderPosts(data.stories);
+                renderPagination(page, data.stories.length);
+                currentPage = page;
+            } catch (error) {
+                showError('Failed to load posts: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Render posts
+        function renderPosts(posts) {
+            if (posts.length === 0) {
+                postsContainer.innerHTML = '<div class="loading">No posts found.</div>';
+                return;
+            }
+
+            postsContainer.innerHTML = posts.map(post => `
+                <article class="post-card">
+                    ${post.content.featured_image ? `
+                        <img src="${post.content.featured_image.filename}" 
+                             alt="${post.content.featured_image.alt || ''}" 
+                             class="post-image">
+                    ` : ''}
+                    
+                    <div class="post-content">
+                        <h2>
+                            <a href="/blog/${post.slug}" class="post-title">
+                                ${post.content.title || post.name}
+                            </a>
+                        </h2>
+                        
+                        <p class="post-excerpt">
+                            ${post.content.excerpt || post.content.intro || ''}
+                        </p>
+                        
+                        <div class="post-meta">
+                            <div class="post-author">
+                                ${post.content.author?.content?.avatar ? `
+                                    <img src="${post.content.author.content.avatar.filename}" 
+                                         alt="${post.content.author.name}" 
+                                         class="author-avatar">
+                                ` : ''}
+                                <span>${post.content.author?.name || 'Anonymous'}</span>
+                            </div>
+                            
+                            <div class="post-date">
+                                ${new Date(post.published_at).toLocaleDateString()}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Render pagination
+        function renderPagination(currentPage, itemsCount) {
+            const hasNext = itemsCount === 9; // Assuming 9 per page
+            const hasPrev = currentPage > 1;
+
+            paginationEl.innerHTML = `
+                <button onclick="loadPosts(${currentPage - 1})" 
+                        ${!hasPrev ? 'disabled' : ''}>
+                    Previous
+                </button>
+                
+                <span>Page ${currentPage}</span>
+                
+                <button onclick="loadPosts(${currentPage + 1})" 
+                        ${!hasNext ? 'disabled' : ''}>
+                    Next
+                </button>
+            `;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search input with debounce
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentSearch = e.target.value.trim();
+                    currentPage = 1;
+                    loadPosts();
+                }, 500);
+            });
+
+            // Category filter
+            categoryFilter.addEventListener('change', (e) => {
+                currentCategory = e.target.value;
+                currentPage = 1;
+                loadPosts();
+            });
+
+            // Author filter
+            authorFilter.addEventListener('change', (e) => {
+                currentAuthor = e.target.value;
+                currentPage = 1;
+                loadPosts();
+            });
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            currentSearch = '';
+            currentCategory = '';
+            currentAuthor = '';
+            currentPage = 1;
+            
+            searchInput.value = '';
+            categoryFilter.value = '';
+            authorFilter.value = '';
+            
+            loadPosts();
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            loadingEl.style.display = show ? 'block' : 'none';
+            postsContainer.style.display = show ? 'none' : 'grid';
+        }
+
+        function showError(message) {
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function hideError() {
+            errorEl.style.display = 'none';
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
