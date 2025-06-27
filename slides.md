@@ -956,6 +956,10 @@ Twig templates bring your content to life with the `render_block` filter.
 </html>
 ```
 
+</div>
+
+<div>
+
 ## Page Template
 
 `templates/page.html.twig`:
@@ -975,11 +979,23 @@ Twig templates bring your content to life with the `render_block` filter.
 {% endblock %}
 ```
 
+**The `render_block` filter handles all the magic! ✨**
+
 </div>
+
+</div>
+
+---
+
+# Block Templates 🎭
+
+Creating templates for your blocks with clean, semantic markup.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
 
 <div>
 
-## Block Templates
+## Teaser Block Template
 
 `templates/blocks/teaser.html.twig`:
 ```twig
@@ -989,12 +1005,34 @@ Twig templates bring your content to life with the `render_block` filter.
 </div>
 ```
 
+</div>
+
+<div>
+
+## Feature Block Template
+
 `templates/blocks/feature.html.twig`:
 ```twig
 <div class="feature {{ block.highlighted ? 'featured' : '' }}">
     <span>{{ block.name }}</span>
 </div>
 ```
+
+</div>
+
+</div>
+
+---
+
+# Nested Block Rendering 🔄
+
+The Grid block demonstrates how to render nested blocks automatically.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
+## Grid Block Template
 
 `templates/blocks/grid.html.twig`:
 ```twig
@@ -1007,7 +1045,26 @@ Twig templates bring your content to life with the `render_block` filter.
 </div>
 ```
 
-**The `render_block` filter handles all the magic! ✨**
+**Nested blocks are rendered recursively!**
+
+</div>
+
+<div>
+
+## How It Works:
+
+- **Grid contains columns** - Each column is a block
+- **Recursive rendering** - `render_block` calls itself
+- **Infinite nesting** - Blocks can contain other blocks
+- **Type safety** - Each block has its own template
+- **Clean markup** - Semantic HTML structure
+
+## Benefits:
+
+✅ **Flexible layouts** - Any combination possible\
+✅ **Reusable components** - Mix and match blocks\
+✅ **Editor-friendly** - Visual drag-and-drop\
+✅ **Developer-friendly** - Clean, maintainable code
 
 </div>
 
@@ -1123,6 +1180,20 @@ final readonly class Article extends ContentType
 - **HTML output** - Clean, semantic markup
 - **Extensible** - Add custom node types
 
+</div>
+
+</div>
+
+---
+
+# Rich Text JSON Structure 📋
+
+Understanding the TipTap document format for rich text content.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
 ## Example Rich Text JSON:
 
 ```json
@@ -1149,69 +1220,641 @@ final readonly class Article extends ContentType
 
 </div>
 
+<div>
+
+## JSON Structure:
+
+- **Document root** - `type: "doc"`
+- **Content array** - Contains all nodes
+- **Paragraph nodes** - Text containers
+- **Text nodes** - Actual content
+- **Marks array** - Formatting (bold, italic, etc.)
+
+## Supported Elements:
+
+✅ **Headings** - H1 through H6\
+✅ **Paragraphs** - Regular text\
+✅ **Lists** - Ordered and unordered\
+✅ **Links** - Internal and external\
+✅ **Images** - From Storyblok assets\
+✅ **Blocks** - Embedded components
+
+</div>
+
 </div>
 
 ---
 
-# Visual Editor Integration 👁️
+# Visual Editor Setup ⚙️
 
-Enable real-time editing with the Storyblok Visual Editor.
+Configure your Symfony project for visual preview with Storyblok.
 
 <div class="grid grid-cols-2 gap-8 pt-6">
 
 <div>
 
-## Add Bridge Script
+## 1. Configure Storyblok Settings
 
-In your base template:
-```twig
-{% block javascripts %}
-    {% if app.environment == 'dev' %}
-        <script src="//app.storyblok.com/f/storyblok-v2-latest.js"></script>
-        <script>
-            const storyblokInstance = new StoryblokBridge({
-                resolveLinks: 'url',
-                resolveRelations: ['author', 'category']
-            });
+In Storyblok: **Settings > Visual Editor**
 
-            storyblokInstance.on(['input', 'published', 'change'], function (event) {
-                if (event.action == 'input') {
-                    // Reload page on content changes
-                    location.reload();
-                }
-            });
-        </script>
-    {% endif %}
-{% endblock %}
+Set default environment to your local dev server:
+```
+https://localhost:8000
+```
+
+💡 **HTTPS required** - Use Symfony CLI:
+```bash
+symfony server:start
+```
+
+## 2. Set Story Real Path
+
+Open your home story → **Config** → Set **Real path** to `/`
+
+</div>
+
+<div>
+
+## 3. Environment Configuration
+
+Set draft mode for development:
+
+`.env.dev`:
+```bash
+STORYBLOK_VERSION=draft
+```
+
+`config/packages/storyblok.yaml`:
+```yaml
+storyblok:
+    version: '%env(STORYBLOK_VERSION)%'
+```
+
+## Benefits:
+
+✅ **Real-time editing** - See changes instantly\
+✅ **HTTPS support** - Secure connection\
+✅ **Environment-specific** - Draft vs published
+
+</div>
+
+</div>
+
+---
+
+# Visual Editor Bridge 🌉
+
+Implement the EditableInterface for interactive content editing.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
+## Update Your Blocks
+
+Make blocks implement `EditableInterface`:
+
+```php
+<?php
+
+namespace App\Block;
+
+use Storyblok\Api\Domain\Type\Editable;
+use Storyblok\Bundle\Block\Attribute\AsBlock;
+use Storyblok\Bundle\Editable\EditableInterface;
+use Storyblok\Bundle\Editable\EditableTrait;
+
+#[AsBlock(name: 'teaser')]
+final readonly class Teaser implements EditableInterface
+{
+    use EditableTrait;
+
+    public function __construct(array $values)
+    {
+        $editable = null;
+        if (\array_key_exists('_editable', $values)) {
+            $editable = new Editable($values['_editable']);
+        }
+        $this->editable = $editable;
+
+        // Your existing properties...
+    }
+}
 ```
 
 </div>
 
 <div>
 
-## Add Editor Attributes
+## Update Content Types
 
-Make content clickable in the editor:
+Same pattern for content types:
+
+```php
+<?php
+
+namespace App\ContentType;
+
+use Storyblok\Bundle\ContentType\ContentType;
+use Storyblok\Bundle\Editable\EditableInterface;
+use Storyblok\Bundle\Editable\EditableTrait;
+
+final readonly class Page extends ContentType
+    implements EditableInterface
+{
+    use EditableTrait;
+
+    public function __construct(array $values)
+    {
+        $editable = null;
+        if (\array_key_exists('_editable', $values)) {
+            $editable = new Editable($values['_editable']);
+        }
+        $this->editable = $editable;
+
+        // Your existing constructor logic...
+    }
+}
+```
+
+</div>
+
+</div>
+
+---
+
+# Bridge Scripts & Attributes 🔗
+
+Connect your templates to the visual editor.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
+## Add Bridge Scripts
+
+In your base template:
+
 ```twig
-<div data-blok-c="{{ page.content._uid }}"
-     data-blok-uid="{{ page.content._uid }}">
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- ... -->
+</head>
+<body>
+    <!-- ... -->
+
+    {% block storyblok_scripts %}
+        {{ storyblok_js_bridge_scripts() }}
+    {% endblock %}
+</body>
+</html>
+```
+
+The `storyblok_js_bridge_scripts()` function:
+- Automatically loads bridge only in draft mode
+- Handles script loading and initialization
+- No manual script tags needed!
+
+</div>
+
+<div>
+
+## Use Storyblok Attributes
+
+Make content editable with the filter:
+
+```twig
+<div {{ page|storyblok_attributes }}>
     <h1>{{ page.name }}</h1>
 
     {% for block in page.body %}
-        <div data-blok-c="{{ block._uid }}"
-             data-blok-uid="{{ block._uid }}">
+        <div {{ block|storyblok_attributes }}>
             {{ block|render_block }}
         </div>
     {% endfor %}
 </div>
 ```
 
-## Visual Editor Benefits:
+The `storyblok_attributes` filter:
+- Adds `data-blok-c` and `data-blok-uid` attributes
+- Only active in draft mode
+- Makes content click-to-edit
 
-✅ **Click-to-edit** - Direct content editing\
-✅ **Real-time preview** - See changes instantly\
-✅ **Context awareness** - Edit in place\
-✅ **Team collaboration** - Shared editing experience
+**🎉 That's it! Your content is now editable in the visual editor!**
+
+</div>
+
+</div>
+
+---
+
+# Internationalization 🌍
+
+Handle multi-language content with Storyblok's field-level translation.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
+## Setup in Storyblok
+
+**1. Add Languages**
+- Go to **Settings** > **Internationalization** > **Languages**
+- Add languages like `it` (Italian), `es` (Spanish), etc.
+
+**2. Configure Content Types**
+- In your content type schema
+- Set fields as **translatable** (title, content, etc.)
+- Use AI Translations for quick setup
+
+**3. Create Translated Content**
+- Edit each story
+- Select target language
+- Provide translated content
+
+</div>
+
+<div>
+
+## Multilingual Routing
+
+`config/routes/storyblok.yaml`:
+```yaml
+storyblok_webhook:
+    resource: '@StoryblokBundle/config/routes/webhook.php'
+
+storyblok_content_type:
+    resource: '@StoryblokBundle/config/routes/content_type.php'
+    prefix:
+        # Order matters (first match wins)
+        it: '/it'
+        es: '/es'
+        en: ''  # Default language, no prefix
+```
+
+**URL Examples:**
+- `/home` → English (default)
+- `/it/home` → Italian
+- `/es/home` → Spanish
+
+</div>
+
+</div>
+
+---
+
+# Using Locale in Controllers 🗣️
+
+Access current locale in your controllers and templates.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
+## Controller Usage
+
+```php
+<?php
+
+namespace App\Controller;
+
+use App\ContentType\Page;
+use Storyblok\Bundle\ContentType\Attribute\AsContentTypeController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+#[AsContentTypeController(contentType: Page::class)]
+final class PageController extends AbstractController
+{
+    public function __invoke(Request $request, Page $page): Response
+    {
+        $locale = $request->getLocale(); // Current locale
+
+        return $this->render('page.html.twig', [
+            'page' => $page,
+            'locale' => $locale,
+        ]);
+    }
+}
+```
+
+</div>
+
+<div>
+
+## Template Usage
+
+```twig
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="locale-indicator">
+        Current language: {{ locale|upper }}
+    </div>
+
+    <h1>{{ page.name }}</h1>
+
+    {% for block in page.body %}
+        <div {{ block|storyblok_attributes }}>
+            {{ block|render_block }}
+        </div>
+    {% endfor %}
+{% endblock %}
+```
+
+## Features:
+
+✅ **Automatic routing** - Bundle handles locale detection\
+✅ **Content fetching** - Right language content loaded\
+✅ **Fallback support** - Default language if missing\
+✅ **SEO-friendly** - Clean URLs with locale prefixes
+
+</div>
+
+</div>
+
+---
+
+# Content Modeling 📝
+
+Learn to handle different content types, references, and API interactions.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
+## Article Content Type
+
+`src/ContentType/Article.php`:
+```php
+<?php
+
+namespace App\ContentType;
+
+use Storyblok\Bundle\ContentType\ContentType;
+
+final readonly class Article extends ContentType
+{
+    public string $uuid;
+    public string $name;
+    public string $slug;
+    public string $title;
+    public array $content;
+    public \DateTimeImmutable $publishedAt;
+
+    public function __construct(array $values)
+    {
+        $this->uuid = $values['uuid'];
+        $this->name = $values['name'];
+        $this->slug = $values['full_slug'];
+        $this->title = $values['content']['title'] ?? '';
+        $this->content = $values['content']['content'] ?? [];
+        $this->publishedAt = new \DateTimeImmutable(
+            $values['published_at']
+        );
+    }
+}
+```
+
+</div>
+
+<div>
+
+## Article Controller
+
+`src/Controller/ArticleController.php`:
+```php
+<?php
+
+namespace App\Controller;
+
+use App\ContentType\Article;
+use Storyblok\Bundle\ContentType\Attribute\AsContentTypeController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+#[AsContentTypeController(contentType: Article::class)]
+final class ArticleController extends AbstractController
+{
+    public function __invoke(Request $request, Article $article): Response
+    {
+        return $this->render('article.html.twig', [
+            'article' => $article,
+        ]);
+    }
+}
+```
+
+## Article Template
+
+`templates/article.html.twig`:
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block body %}
+    <article>
+        <h1>{{ article.title }}</h1>
+        <div class="content">
+            {{ article.content|rich_text }}
+        </div>
+    </article>
+{% endblock %}
+```
+
+</div>
+
+</div>
+
+---
+
+# Content Lists & API Usage 📋
+
+Fetch and display collections of content using the Stories API.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
+## Article Overview Controller
+
+`src/Controller/ArticleOverviewController.php`:
+```php
+<?php
+
+namespace App\Controller;
+
+use App\ContentType\ArticleOverview;
+use Storyblok\Api\StoriesApiInterface;
+use Storyblok\Api\Request\StoriesRequest;
+use Storyblok\Bundle\ContentType\Attribute\AsContentTypeController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+#[AsContentTypeController(contentType: ArticleOverview::class)]
+final class ArticleOverviewController extends AbstractController
+{
+    public function __construct(
+        private readonly StoriesApiInterface $storiesApi
+    ) {
+    }
+
+    public function __invoke(
+        Request $request,
+        ArticleOverview $articleOverview
+    ): Response {
+        $response = $this->storiesApi->allByContentType(
+            'article',
+            new StoriesRequest(language: $request->getLocale())
+        );
+
+        return $this->render('article_overview.html.twig', [
+            'articleOverview' => $articleOverview,
+            'articles' => $response->stories,
+        ]);
+    }
+}
+```
+
+</div>
+
+<div>
+
+## Article Overview Template
+
+`templates/article_overview.html.twig`:
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}Articles{% endblock %}
+
+{% block body %}
+    <h1>Articles</h1>
+    <ul>
+        {% for article in articles %}
+            {% if article.full_slug is defined %}
+                <li>
+                    <a href="/{{ article.full_slug }}">
+                        {{ article.name }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endblock %}
+```
+
+## Key Features:
+
+✅ **API Injection** - Use `StoriesApiInterface`\
+✅ **Type filtering** - Get content by type\
+✅ **Locale support** - Automatic language handling\
+✅ **Template loops** - Display collections easily
+
+</div>
+
+</div>
+
+---
+
+# Story References & Relations 🔗
+
+Handle referenced stories with automatic relation resolution.
+
+<div class="grid grid-cols-2 gap-8 pt-6">
+
+<div>
+
+## Featured Articles Block
+
+`src/Block/FeaturedArticles.php`:
+```php
+<?php
+
+namespace App\Block;
+
+use Storyblok\Bundle\Block\Attribute\AsBlock;
+
+#[AsBlock(name: 'featured-articles')]
+final readonly class FeaturedArticles
+{
+    public array $articles;
+
+    public function __construct(array $values)
+    {
+        $this->articles = $values['articles'] ?? [];
+    }
+}
+```
+
+## Block Template
+
+`templates/blocks/featured_articles.html.twig`:
+```twig
+<section class="featured-articles">
+    <h2>Featured Articles</h2>
+    <ul>
+        {% for article in block.articles %}
+            {% if article.full_slug is defined %}
+                <li>
+                    <a href="/{{ article.full_slug }}">
+                        {{ article.name }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</section>
+```
+
+</div>
+
+<div>
+
+## Resolve Relations in Controller
+
+Update PageController to handle references:
+```php
+use Storyblok\Api\StoriesApiInterface;
+use Storyblok\Api\Request\StoryRequest;
+use Storyblok\Api\Domain\Value\Resolver\RelationCollection;
+
+#[AsContentTypeController(contentType: Page::class)]
+final class PageController extends AbstractController
+{
+    public function __construct(
+        private readonly StoriesApiInterface $storiesApi
+    ) {
+    }
+
+    public function __invoke(Request $request, Page $page): Response
+    {
+        // Resolve featured article references
+        $response = $this->storiesApi->bySlug(
+            $page->slug,
+            new StoryRequest(
+                language: $request->getLocale(),
+                withRelations: new RelationCollection([
+                    'featured-articles.articles'
+                ])
+            )
+        );
+
+        $resolvedPage = new Page($response->story);
+
+        return $this->render('page.html.twig', [
+            'page' => $resolvedPage,
+        ]);
+    }
+}
+```
+
+**⚠️ Limit: Maximum 50 relations per request**
 
 </div>
 
