@@ -3,7 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "slidev build",
+    "build-theme": "cd themes/unicorn && pnpm install && cd ../..",
+    "build": "npm run build-theme && slidev build",
     "dev": "slidev --open",
     "export": "slidev export"
   },
