@@ -1,5 +1,5 @@
 ---
-theme: themes/slidev-theme-unicorn
+theme: themes/unicorn
 title: From Headless to Limitless - Storyblok & Symfony Workshop
 info: |
   ## From Headless to Limitless: Storyblok & Symfony Workshop
