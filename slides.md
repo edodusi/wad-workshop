@@ -9,72 +9,38 @@ info: |
 class: text-center
 drawings:
   persist: false
-transition: slide-left
 mdc: true
-logoHeader: '/storyblok.svg'
 website: 'storyblok.com'
----
-
-# From Headless to Limitless
-## Storyblok & Symfony Workshop
-
-<div class="pt-12">
-  <span @click="$slidev.nav.next" class="px-2 py-1 rounded cursor-pointer" hover:bg="white hover:bg-opacity-10">
-    Building powerful web applications with modern CMS <carbon:arrow-right class="inline"/>
-  </span>
-</div>
-
-<div class="pt-8 text-lg opacity-75">
-  **Edoardo Dusi** - Storyblok • **Silas Joisten** - SensioLabs
-</div>
-
-<div class="abs-br m-6 flex gap-2">
-  <a href="https://github.com/storyblok" target="_blank" alt="GitHub" title="Storyblok on GitHub"
-    class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
-    <carbon-logo-github />
-  </a>
-</div>
-
----
+src: pages/0-introduction.md
 transition: fade-out
 ---
 
-# Welcome to the Storyblok & Symfony Workshop! 👋
+---
+src: pages/1-storyblok.md
+---
 
-<div class="grid grid-cols-2 gap-8 pt-4">
+---
+src: pages/2-lets-code.md
+---
 
-<div>
+# What you will learn in this workshop
 
-## What we'll cover:
+<div class="list-none">
 
-**🧱 Part 1: Storyblok Fundamentals**
-- Stories, Blocks, Visual Editor
-- Content Delivery API
-- Field Types & Relations
+<v-clicks>
 
-**🚀 Part 2: Symfony Integration**
-- Official Storyblok Symfony Bundle
-- Content Types & Controllers
-- Blocks & Templates
-- Real-world Implementation
+- ✅ Master Storyblok's core concepts
+- ✅ Navigate the Content Delivery API
+- ✅ Set up Symfony with Storyblok
+- ✅ Create content types and blocks
+- ✅ Build dynamic, content-driven apps
+- ✅ Handle routing and templates
+- ✅ Implement best practices
 
-</div>
-
-<div>
-
-## You'll learn to:
-
-✅ Master Storyblok's core concepts\
-✅ Navigate the Content Delivery API\
-✅ Set up Symfony with Storyblok\
-✅ Create content types and blocks\
-✅ Build dynamic, content-driven apps\
-✅ Handle routing and templates\
-✅ Implement best practices
+</v-clicks>
 
 </div>
 
-</div>
 
 ---
 layout: default
@@ -119,14 +85,6 @@ layout: default
 - Best Practices
 
 </div>
-
-</div>
-
-<div class="pt-4 text-center">
-
-**🎯 Goal:** Build a complete Storyblok-powered Symfony application
-
-*Plus 15 minutes for Q&A and wrap-up*
 
 </div>
 
