@@ -4,6 +4,31 @@ layout: cover
 
 # Introduction Storyblok
 
+
+---
+layout: content
+---
+
+## What is a Content Type? 📑
+
+A **Content Type** is a reusable schema that defines the structure of content in Storyblok, allowing for consistent data entry and management.
+
+<div class="grid grid-cols-2 gap-8 mt-8">
+
+<div>
+
+<v-clicks>
+
+1. **Reusable Schema**: Defines fields and structure
+2. **Consistent Data Entry**:  Ensures uniformity across content
+3. **Examples**: Page, Article, Product
+
+</v-clicks>
+
+</div>
+
+</div>
+
 ---
 layout: content
 ---
@@ -29,6 +54,8 @@ A **Story** is a multi-purpose content entry, with each story's schema defined b
 
 <div>
 
+<v-click>
+
 ```json
 {
   "story": {
@@ -47,6 +74,33 @@ A **Story** is a multi-purpose content entry, with each story's schema defined b
   rels: []
 }
 ```
+
+</v-click>
+
+</div>
+
+</div>
+
+---
+layout: content
+---
+
+## What is a Folder? 📂
+
+A **Folder** is a logical grouping of stories, allowing for better organization and management of content.
+
+<div class="grid grid-cols-2 gap-8 pt-4">
+
+<div class="mt-12">
+
+<v-clicks>
+
+1. Organizational **containers**
+2. **Group** related content
+3. **No URL** by default
+4. Can contain **stories** and **subfolders**
+
+</v-clicks>
 
 </div>
 
@@ -76,6 +130,8 @@ layout: content
 
 <div>
 
+<v-click>
+
 ```json
 {
   "component": "hero_section",
@@ -95,18 +151,8 @@ layout: content
 }
 ```
 
-</div>
+</v-click>
 
 </div>
 
----
-layout: content
----
-
-## What is a Folder? 📂
-
----
-layout: content
----
-
-## What is a Content Type? 📑
+</div>
