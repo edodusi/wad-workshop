@@ -1,6 +1,8 @@
 <template>
-  <default class="cover">
-    <slot />
+  <default>
+    <div class="cover">
+      <slot/>
+    </div>
   </default>
 </template>
 
