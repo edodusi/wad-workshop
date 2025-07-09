@@ -2,8 +2,8 @@
 layout: cover
 ---
 
-# From Headless to Limitless
-## Storyblok & Symfony Workshop
+# Build Production ready Headless CMS Solutions
+## Mastering Storyblok & Symfony
 
 ---
 
